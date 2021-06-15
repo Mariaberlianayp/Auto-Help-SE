@@ -19,7 +19,7 @@
             <a href="index.html" class="home">Bengkel</a>
             <a href="pesan.html" class="pesan">Pesan</a>
             <a href="markah.html" class="markah">Markah</a>
-            <a href="Profil.html" class="profil">Profil</a>
+            <a href="profil.php" class="profil">Profil</a>
             
         </div>
     </nav>
