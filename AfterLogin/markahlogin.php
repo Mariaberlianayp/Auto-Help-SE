@@ -1,10 +1,58 @@
+
 <?php 
-session_start();
 
-if (isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
+$connect = mysqli_connect("localhost", "id17056886_mariaberlianayapputri", "M4ri41234567890!", "id17056886_test_db");
 
- ?>
+if(isset($_POST["add_to_cart"]))
+{
+	if(isset($_SESSION["shopping_cart"]))
+	{
+		$item_array_id = array_column($_SESSION["shopping_cart"], "item_id");
+		if(!in_array($_GET["id"], $item_array_id))
+		{
+			$count = count($_SESSION["shopping_cart"]);
+			$item_array = array(
+				'item_id'			=>	$_GET["id"],
+				'item_name'			=>	$_POST["hidden_name"],
+        'item_image'			=>	$_POST["hidden_image"],
+				'item_keterangan'		=>	$_POST["hidden_keterangan"]
+			);
+			$_SESSION["shopping_cart"][$count] = $item_array;
+		}
+		else
+		{
+			echo '<script>alert("Item Already Added")</script>';
+		}
+	}
+	else
+	{
+		$item_array = array(
+			'item_id'			=>	$_GET["id"],
+			'item_name'			=>	$_POST["hidden_name"],
+			'item_image'			=>	$_POST["hidden_image"],
+			'item_keterangan'		=>	$_POST["hidden_keterangan"]
+		);
+		$_SESSION["shopping_cart"][0] = $item_array;
+	}
+}
 
+if(isset($_GET["action"]))
+{
+	if($_GET["action"] == "delete")
+	{
+		foreach($_SESSION["shopping_cart"] as $keys => $values)
+		{
+			if($values["item_id"] == $_GET["id"])
+			{
+				unset($_SESSION["shopping_cart"][$keys]);
+				echo '<script>alert("Item Removed")</script>';
+				echo '<script>window.location="home.php"</script>';
+			}
+		}
+	}
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,11 +99,12 @@ if (isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
             border-top-left-radius: 20px;
             border-top-right-radius: 20px; 
         }
-        /* .selection{
+        .selection{
             display: flex;
             justify-content: space-evenly;
             text-align: center;
             padding-bottom: 5%;
+            margin-top: 50px; 
         }
 
         .beng{
@@ -83,17 +132,6 @@ if (isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
         }
         #mark{
             width: 50%;
-        } */
-        .logindulu
-        {
-            padding: 200px 0px;
-            display: flex;
-            justify-content: center;
-        }
-        .logindulu p
-        {
-            
-            color: #193350;
         }
 
         footer
@@ -121,20 +159,27 @@ if (isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
             </div>
         
         </nav>
-        
-        <div class="logindulu">
-            <p>Belum ada markah!</p>
-        </div>
-        <!-- <div class="selection">
+        <div class="selection">
+            <?php
+                if(!empty($_SESSION["shopping_cart"]))
+                {
+                    foreach($_SESSION["shopping_cart"] as $keys => $values)
+                    {
+                ?>
             <div class="beng">
-                <img src="assets/image/bengkel-mobil-jakarta-bengkel-bos.jpg" alt="">
+                <img src="../assets/image/<?php echo $values["item_image"]; ?>" alt="">
                 <div class="detail">
-                    <h3>CARfix</h3><p>Jakarta Selatan</p>
-                    <h3>Karang Tengah</h3>
-                    <img src="assets/image/markah.png" id="mark" alt="">
+                    <h3><?php echo $values["item_name"]; ?></h3>
+                    <p><?php echo $values["item_keterangan"]; ?></p>
+                    <a href="home.php?action=delete&id=<?php echo $values["item_id"]; ?>"><span class="text-danger">Remove</span></a>
                 </div>
             </div>
-            <div class="beng">
+            <?php
+                    }
+				}
+			?>
+						
+            <!-- <div class="beng">
                 <img src="assets/image/bengkel-mobil-jakarta-kjs-motor.jpg" alt="">
                 <div class="detail">
                     <h3>CARfix</h3><p>Jakarta Timur</p>
@@ -152,28 +197,17 @@ if (isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
             </div> 
             
             <div class="beng">
-                <img src="assets/image/bengkel-mobil-jakarta-kudamas-resepsionis.jpg" alt="">
+                <img src="../assets/image/bengkel-mobil-jakarta-kudamas-resepsionis.jpg" alt="">
                 <div class="detail">
                     <h3>CARfix</h3><p>Jakarta Timur</p>
                     <h3>Karang Tengah</h3>
                     <img src="assets/image/markah.png" id="mark" alt="">
                 </div>
-                
-                
-              
-                    
-            </div>   
-        </div> -->
+            </div>    -->
+        </div>
 
         <footer>
             <h2>Auto Help</h2>
         </footer>
 </body>
 </html>
-
-<?php 
-}else{
-     header("Location: profil.php");
-     exit();
-}
- ?>

@@ -36,28 +36,7 @@
     border-top-left-radius: 20px;
     border-top-right-radius: 20px; 
 }
-.search
-{
-    display: flex;
-    justify-content: center;
-    background-color: #193350;
-    padding: 20px;
 
-}
-
-#pac-input {
-    background-color: #FDBA3D;
-    font-family: Roboto;
-    font-size: 15px;
-    font-weight: 300;
-    margin-left: 12px;
-    padding: 10px 15px;
-    
-    text-overflow: ellipsis;
-    width: 400px;
-    color: #193350;
-    border-radius: 20px;
-  }
 
 .jual-beli i , .komunitas i, .turtorial i
 {

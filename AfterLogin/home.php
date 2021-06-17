@@ -1,9 +1,57 @@
 <?php 
 session_start();
+$connect = mysqli_connect("localhost", "id17056886_mariaberlianayapputri", "M4ri41234567890!", "id17056886_test_db");
 
-if (isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
+if(isset($_POST["add_to_cart"]))
+{
+	if(isset($_SESSION["shopping_cart"]))
+	{
+		$item_array_id = array_column($_SESSION["shopping_cart"], "item_id");
+		if(!in_array($_GET["id"], $item_array_id))
+		{
+			$count = count($_SESSION["shopping_cart"]);
+			$item_array = array(
+				'item_id'			=>	$_GET["id"],
+				'item_name'			=>	$_POST["hidden_name"],
+        'item_image'			=>	$_POST["hidden_image"],
+				'item_keterangan'		=>	$_POST["hidden_keterangan"]
+			);
+			$_SESSION["shopping_cart"][$count] = $item_array;
+		}
+		else
+		{
+			echo '<script>alert("Item Already Added")</script>';
+		}
+	}
+	else
+	{
+		$item_array = array(
+			'item_id'			=>	$_GET["id"],
+			'item_name'			=>	$_POST["hidden_name"],
+			'item_image'			=>	$_POST["hidden_image"],
+			'item_keterangan'		=>	$_POST["hidden_keterangan"]
+		);
+		$_SESSION["shopping_cart"][0] = $item_array;
+	}
+}
 
- ?>
+if(isset($_GET["action"]))
+{
+	if($_GET["action"] == "delete")
+	{
+		foreach($_SESSION["shopping_cart"] as $keys => $values)
+		{
+			if($values["item_id"] == $_GET["id"])
+			{
+				unset($_SESSION["shopping_cart"][$keys]);
+				echo '<script>alert("Item Removed")</script>';
+				echo '<script>window.location="home.php"</script>';
+			}
+		}
+	}
+}
+
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,6 +66,7 @@ if (isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
     <script src="https://kit.fontawesome.com/fdb32bd070.js" crossorigin="anonymous"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <style type="text/css">
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
@@ -123,14 +172,11 @@ if (isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
             
         </div>
     </nav>
-    <div class="search">
-      <input
-        id="pac-input"
-        class="controls"
-        type="text"
-        placeholder="Cari &#34; Bengkel dekat sini &#34; "
-      />
+    <div class="gcse-search">
       
+      <script async src=
+        "https://cse.google.com/cse.js?cx=007019498718139788174:amtiepdpgeg">
+      </script>
     </div>
     <div id="map"></div>
     <main>
@@ -142,7 +188,7 @@ if (isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
             </a>
           </div>
           <div class="komunitas">
-            <a href="">
+            <a href="../komunitas/index.php">
               <i class="fas fa-photo-video"></i>
               <p>Komunitas</p> 
             </a>
@@ -154,39 +200,42 @@ if (isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
             </a>
           </div>
         </div>
+        
         <div class="rekomendasi">
           <h4>Bengkel Terbaik Jakarta</h4>
           <div class="rekomendbengkel">
-            <div class="daftarrekomend">
-              <img class="rekomendimg satu" src="../assets/image/bengkel-mobil-jakarta-kjs-motor.jpg" alt="">
-              <p class="judulrekomend">KJS Motor – Spesialis Bengkel Mesin & Transmisi Mobil Jakarta</p>
-              <p class="daerahrekomend">Cengkareng, Jakarta Barat</p>
+            <?php
+              $query = "SELECT * FROM produk ORDER BY id ASC";
+              $result = mysqli_query($connect, $query);
+              if(mysqli_num_rows($result) > 0)
+              {
+                while($row = mysqli_fetch_array($result))
+                {
+            ?>
+            <div class="daftarrekomend " >
+              <form method="post" action="home.php?action=add&id=<?php echo $row["id"]; ?>">
+                <img class="rekomendimg satu" src="../assets/image/<?php echo $row["image"]; ?>" alt="">
+                <p class="judulrekomend"><?php echo $row["name"]; ?></p>
+                <div class="markahin">
+                  <p class="daerahrekomend"><?php echo $row["keterangan"]; ?></p>
+                  <input type="hidden" name="hidden_name" value="<?php echo $row["name"]; ?>" />
+                  <input type="hidden" name="hidden_image" value="<?php echo $row["image"]; ?>" />
+                  <input type="hidden" name="hidden_keterangan" value="<?php echo $row["keterangan"]; ?>" />
+                  <input type="submit" name="add_to_cart"  class="btn btn-success" value="markah" class="markahbtn btn btn-success" />
+                </div>
+              </form>
             </div>
-            <div class="daftarrekomend">
-              <img class="rekomendimg dua" src="../assets/image/bengkel-mobil-jakarta-bengkel-bos.jpg" alt="">
-              <p class="judulrekomend">Bengkel Mobil BOS Kedoya</p>
-              <p class="daerahrekomend">Kb.Jeruk, Jakarta Barat</p>
-            </div>
-            <div class="daftarrekomend">
-              <img class="rekomendimg tiga" src="../assets/image/bengkel-mobil-jakarta-dokter-mobil.jpg" alt="">
-              <p class="judulrekomend">Dokter Mobil – Bengkel Service AC & Tune Up Mobil</p>
-              <p class="daerahrekomend">Kelapa Gading, Jakarta Barat</p>
-            </div>
-            <div class="daftarrekomend">
-              <img class="rekomendimg empat" src="../assets/image/bengkel-mobil-jakarta-varia-2000.jpg" alt="">
-              <p class="judulrekomend">VARIA 2000 ( Auto Car Workshop )</p>
-              <p class="daerahrekomend">Cengkareng, Jakarta Barat</p>
-            </div>
-            <div class="daftarrekomend">
-              <img class="rekomendimg lima" src="../assets/image/bengkel-mobil-jakarta-kudamas-resepsionis.jpg" alt="">
-              <p class="judulrekomend">Kudamas Autoindo</p>
-              <p class="daerahrekomend">Tj. Priok, Jakarta Barat</p>
-            </div>
+            <?php
+                }
+              }
+            ?>
 
           </div>
         </div>
+       
+
         <div class="bengkelfav">
-          <a href="">
+          <a href="markahlogin.php">
                
             <img src="../assets/image/bengkel favorite.png" alt="">
           </a>
@@ -201,12 +250,6 @@ if (isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCMi2qKZ0ISZjoECbBZNfRLwrEgRYWMew&callback=initMap&libraries=&v=weekly"
       async
     ></script>
+    
 </body>
 </html>
-
-<?php 
-}else{
-     header("Location: profil.php");
-     exit();
-}
- ?>
